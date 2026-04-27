@@ -53,8 +53,7 @@ def init_database():
         CREATE TABLE IF NOT EXISTS received_departments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             departmentCode TEXT NOT NULL,
-            departmentName TEXT NOT NULL,
-            createTime TEXT NOT NULL
+            departmentName TEXT NOT NULL
         )
     """)
 
@@ -127,11 +126,10 @@ async def batch_insert_dept(request: Request, departments: list[DepartmentItem] 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    data = [(dept.departmentCode, dept.departmentName, now) for dept in departments]
+    data = [(dept.departmentCode, dept.departmentName) for dept in departments]
 
     cursor.executemany(
-        "INSERT INTO received_departments (departmentCode, departmentName, createTime) VALUES (?, ?, ?)",
+        "INSERT INTO received_departments (departmentCode, departmentName) VALUES (?, ?)",
         data
     )
     conn.commit()
@@ -158,7 +156,7 @@ def get_received_departments():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, departmentCode, departmentName, createTime FROM received_departments ORDER BY id DESC")
+    cursor.execute("SELECT id, departmentCode, departmentName FROM received_departments ORDER BY id DESC")
     rows = cursor.fetchall()
     conn.close()
 
@@ -166,8 +164,7 @@ def get_received_departments():
         {
             "id": row["id"],
             "departmentCode": row["departmentCode"],
-            "departmentName": row["departmentName"],
-            "createTime": row["createTime"]
+            "departmentName": row["departmentName"]
         }
         for row in rows
     ]
