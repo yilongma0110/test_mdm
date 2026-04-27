@@ -174,5 +174,25 @@ def get_received_departments():
     }
 
 
+@app.delete("/api/department/clearReceivedDepts")
+def clear_received_departments():
+    """
+    清空 received_departments 表中的所有数据
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM received_departments")
+    deleted = cursor.rowcount
+    conn.commit()
+    conn.close()
+
+    return {
+        "code": 200,
+        "msg": "清空成功",
+        "data": {"deleted": deleted}
+    }
+
+
 # 启动时初始化数据库
 init_database()
