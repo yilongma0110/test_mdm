@@ -145,5 +145,34 @@ def root():
     return {"message": "MDM 模拟接口服务已启动", "docs": "/docs"}
 
 
+@app.get("/api/department/getReceivedDepts")
+def get_received_departments():
+    """
+    查询已接收的部门数据（从 received_departments 表）
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, departmentCode, departmentName, createTime FROM received_departments ORDER BY id DESC")
+    rows = cursor.fetchall()
+    conn.close()
+
+    data = [
+        {
+            "id": row["id"],
+            "departmentCode": row["departmentCode"],
+            "departmentName": row["departmentName"],
+            "createTime": row["createTime"]
+        }
+        for row in rows
+    ]
+
+    return {
+        "code": 200,
+        "msg": "操作成功",
+        "data": data
+    }
+
+
 # 启动时初始化数据库
 init_database()
