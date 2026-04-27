@@ -6,8 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
+from fastapi import Request
 import sqlite3
 import os
+import logging
 
 app = FastAPI(title="MDM 模拟接口服务", version="1.0.0")
 
@@ -108,10 +110,13 @@ def query_all_department():
 
 # 接口二：POST 批量接收部门数据
 @app.post("/api/department/batchInsertDept")
-def batch_insert_dept(departments: list[DepartmentItem]):
+async def batch_insert_dept(request: Request, departments: list[DepartmentItem] = None):
     """
     批量接收并保存 MDM 推送的部门数据
     """
+    # 获取原始请求体并打印
+    body = await request.body()
+    print(f"[LOG] 收到原始请求体: {body.decode('utf-8', errors='replace')}")
     if not departments:
         return {
             "code": 200,
